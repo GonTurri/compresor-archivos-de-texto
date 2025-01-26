@@ -14,6 +14,7 @@ Compresor casero para comprimir archivos de texto que implementa el [algoritmo d
 
 ### Comprimir un archivo
 ``` ./compresor ejemplo.txt ```
+
 Esto generará un archivo ejemplo.comprimido
 
 ### Descomprimir un archivo
