@@ -35,8 +35,14 @@ int compararRepeticiones(const void *a, const void *b)
 t_nodo *nodo_create_rama(int repeticiones, char *caracteres, t_nodo *izq, t_nodo *der)
 {
     t_nodo *nuevo = (t_nodo *)malloc(sizeof(t_nodo));
+
+    if (!nuevo)
+    {
+        perror("error al asignarle memoria a un nodo");
+        exit(EXIT_FAILURE);
+    }
     nuevo->repeticiones = repeticiones;
-    nuevo->caracteres = caracteres;
+    nuevo->caracteres = caracteres ? strdup(caracteres) : NULL;
     nuevo->izq = izq;
     nuevo->der = der;
     nuevo->caracter = -2;
@@ -46,6 +52,11 @@ t_nodo *nodo_create_rama(int repeticiones, char *caracteres, t_nodo *izq, t_nodo
 t_nodo *nodo_create_hoja(int repeticiones, int caracter)
 {
     t_nodo *nuevo = (t_nodo *)malloc(sizeof(t_nodo));
+    if (!nuevo)
+    {
+        perror("error al asignarle memoria a un nodo");
+        exit(EXIT_FAILURE);
+    }
     nuevo->repeticiones = repeticiones;
     nuevo->caracteres = NULL;
     nuevo->izq = NULL;
@@ -54,12 +65,19 @@ t_nodo *nodo_create_hoja(int repeticiones, int caracter)
     return nuevo;
 }
 
-// void nodo_destroy(t_nodo* nodo){
-//     free(nodo->caracteres);
-//     free(nodo->izq);
-//     free(nodo->der);
-//     free(nodo);
-// }
+void nodo_destroy(t_nodo *nodo)
+{
+    if (!nodo)
+        return;
+
+    nodo_destroy(nodo->izq);
+    nodo_destroy(nodo->der);
+
+    if (nodo->caracteres)
+        free(nodo->caracteres);
+
+    free(nodo);
+}
 
 t_nodo *construir_arbol_huffman(t_caracter array_caracteres[], int inicio, int fin, char *cadena_previa, int frecuencia_previa)
 {
@@ -89,6 +107,9 @@ t_nodo *construir_arbol_huffman(t_caracter array_caracteres[], int inicio, int f
 
     t_nodo *izq = construir_arbol_huffman(array_caracteres, inicio, mitad, cadena_caracteres_izq, frecuencia_acumulada);
     t_nodo *der = construir_arbol_huffman(array_caracteres, mitad + 1, fin, cadena_caracteres_der, frecuencia_previa - frecuencia_acumulada);
+
+    free(cadena_caracteres_izq);
+    free(cadena_caracteres_der);
 
     return nodo_create_rama(frecuencia_previa, cadena_previa, izq, der);
 }
@@ -297,6 +318,10 @@ void descomprimir_archivo(const char *path_archivo)
     }
     fclose(f);
     fclose(archivo_descomprimido);
+    free(lector);
+    free(nombre_original);
+    free(nombre_descomprimido);
+    nodo_destroy(arbol_huffman);
 }
 
 void comprimir_archivo(const char *path_archivo)
@@ -338,6 +363,8 @@ void comprimir_archivo(const char *path_archivo)
     }
     t_nodo *arbol_huffman = construir_arbol_huffman(caracteres, 0, final - 1, cadena_caracteres_total, caracteres_archivo);
 
+    free(cadena_caracteres_total);
+
     // imprimirArbol(arbol_huffman, 0);
 
     char *path_archivo_comprimido = get_path_archivo_comprimido(path_archivo);
@@ -365,6 +392,8 @@ void comprimir_archivo(const char *path_archivo)
     codificar_archivo(path_archivo, arbol_huffman, camino_caracter, caracteres_archivo, buf);
 
     fclose(archivo_comprimido);
+    nodo_destroy(arbol_huffman);
+    free(buf);
 }
 
 int comparar_arboles(t_nodo *a, t_nodo *b)
