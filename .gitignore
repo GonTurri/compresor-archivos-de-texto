@@ -1,0 +1,7 @@
+*.o
+*.a
+*.exe
+*.dll
+*.DS_Store
+.vscode/
+*.code-workspace
