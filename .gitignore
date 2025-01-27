@@ -5,3 +5,5 @@
 *.DS_Store
 .vscode/
 *.code-workspace
+compresor
+*.comprimido
