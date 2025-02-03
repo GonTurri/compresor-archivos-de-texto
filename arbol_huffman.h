@@ -1,3 +1,6 @@
+#ifndef ARBOL_HUFFMAN_H_INCLUDED
+#define ARBOL_HUFFMAN_H_INCLUDED
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,4 +42,6 @@ t_nodo *deserializar_arbol_huffman(t_lector_32_bits *lector);
 int comparar_arboles(t_nodo *a, t_nodo *b);
 
 void imprimir_camino(int camino[]);
+
+#endif
 
